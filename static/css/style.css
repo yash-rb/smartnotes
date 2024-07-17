@@ -1,3 +1,4 @@
-.notes-li{
-    color:red;
+ul.errorlist{
+    color:blue;
+    display: none;
 }
