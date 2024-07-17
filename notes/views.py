@@ -1,9 +1,11 @@
+from django.forms import BaseModelForm
 from django.shortcuts import render
 from .models import Notes
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from .forms import NotesForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class NotesCreateView(CreateView):
@@ -11,6 +13,12 @@ class NotesCreateView(CreateView):
        template_name = "notes/notes_form.html"
        form_class = NotesForm
        success_url = '/smart/notes'
+
+       def form_valid(self, form):
+              self.object = form.save(commit=False)
+              self.object.user = self.request.user
+              self.object.save()
+              return HttpResponseRedirect(self.get_success_url())
 
 class NotesUpdateView(UpdateView):
        model = Notes
@@ -23,10 +31,14 @@ class NotesDeleteView(DeleteView):
        template_name = 'notes/notes_delete.html'
 
 
-class NotesListView(ListView):
+class NotesListView(LoginRequiredMixin, ListView):
        model = Notes
        context_object_name = "notes"
        template_name = "notes/notes_list.html"
+       login_url = '/admin'
+
+       def get_queryset(self):
+              return self.request.user.notes.all()
 
 
 
