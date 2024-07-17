@@ -14,12 +14,17 @@ from django.shortcuts import redirect
 class SignupView(CreateView):
     form_class= UserCreationForm
     template_name = 'home/register.html'
-    success_url = 'smart/notes'
+    success_url = '/login'
     
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         if self.request.user.is_authenticated:
             return redirect('notes.list')
         return super().get(request, *args, **kwargs)
+     #uncomment For checking errors in user creation   
+    # def form_invalid(self, form):
+    #     # Log or print form errors
+    #     print(form.errors)
+    #     return super().form_invalid(form)
 
 class LoginInterfaceView(LoginView):
     template_name = 'home/login.html'
